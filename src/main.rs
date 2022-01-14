@@ -69,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if let Ok(stylesheet) = parsed {
         let document: Html = Html::parse_document(&html);
-        let select_all: Selector = Selector::parse("*").unwrap();
+        let select_all: Selector = Selector::parse("*:not(head)").unwrap();
 
         for (index, css_rule) in stylesheet.rules.0.iter().enumerate() {
             let mut matched = false;
