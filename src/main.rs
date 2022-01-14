@@ -7,7 +7,7 @@ use scraper::{Html, Selector};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let html = r#"
         <!DOCTYPE html>
-        <html lang="en>
+        <html lang="en" class="dark-theme">
             <head>
                 <meta charset="UTF-8">
                 <title>Test</title>
@@ -36,6 +36,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .to_string();
 
     let css = "
+        .dark-theme body {
+            background-color: #333;
+        }
+
         .foo {
             color: red;
         }
@@ -69,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if let Ok(stylesheet) = parsed {
         let document: Html = Html::parse_document(&html);
-        let select_all: Selector = Selector::parse("*:not(head)").unwrap();
+        let select_all: Selector = Selector::parse("html, body, body *").unwrap();
 
         for (index, css_rule) in stylesheet.rules.0.iter().enumerate() {
             let mut matched = false;
