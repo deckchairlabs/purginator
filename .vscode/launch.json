@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'rust-template'",
+            "name": "Debug executable 'purginator'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rust-template",
-                    "--package=rust-template"
+                    "--bin=purginator",
+                    "--package=purginator"
                 ],
                 "filter": {
-                    "name": "rust-template",
+                    "name": "purginator",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'rust-template'",
+            "name": "Debug unit tests in executable 'purginator'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=rust-template",
-                    "--package=rust-template"
+                    "--bin=purginator",
+                    "--package=purginator"
                 ],
                 "filter": {
-                    "name": "rust-template",
+                    "name": "purginator",
                     "kind": "bin"
                 }
             },
