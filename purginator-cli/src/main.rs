@@ -4,7 +4,7 @@ use parcel_css::stylesheet::PrinterOptions;
 use purginator::purge;
 use tokio::fs;
 
-/// Simple program to greet a person
+/// Purge css with speed
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
