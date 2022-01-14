@@ -1,0 +1,12 @@
+[package]
+name = "purginator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cssparser = "0.29.2"
+parcel_css = "1.0.0-alpha.10"
+reqwest = { version = "0.11", features = ["json"] }
+scraper = "0.12"
+thiserror = "1.0"
+tokio = { version = "1", features = ["full"] }

@@ -1,0 +1,15 @@
+[package]
+name = "purginator-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "purginator"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "3.0", features = ["derive"] }
+miette = { version = "3.3", features = ["fancy"] }
+parcel_css = "1.0.0-alpha.10"
+purginator = { path = "../purginator" }
+tokio = { version = "1.15", features = ["fs", "rt-multi-thread"] }
