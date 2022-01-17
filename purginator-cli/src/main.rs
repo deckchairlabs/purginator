@@ -36,10 +36,10 @@ async fn main() -> miette::Result<()> {
     )
     .unwrap();
 
-    let html_purger = Box::new(PurgeFromHtml::new(&html_source)) as Box<dyn Purger>;
-    let purgers = vec![html_purger];
+    let html_purger = PurgeFromHtml::new(&html_source);
+    let purgers: [&dyn Purger; 1] = [&html_purger];
 
-    let stylesheet = purge(stylesheet, purgers);
+    let stylesheet = purge(stylesheet, &purgers);
 
     let purged_css = stylesheet
         .to_css(PrinterOptions {

@@ -4,21 +4,21 @@ use parcel_css::rules::{
 };
 
 pub trait Purger {
-    fn should_purge_style(&self, style: &mut StyleRule) -> bool;
+    fn should_purge_style(&self, style: &StyleRule) -> bool;
 
-    fn should_purge_media(&self, media: &mut MediaRule) -> bool {
+    fn should_purge_media(&self, media: &MediaRule) -> bool {
         media.rules.0.is_empty()
     }
 
-    fn should_purge_supports(&self, supports: &mut SupportsRule) -> bool {
+    fn should_purge_supports(&self, supports: &SupportsRule) -> bool {
         supports.rules.0.is_empty()
     }
 
-    fn should_purge_nesting(&self, nesting: &mut NestingRule) -> bool {
+    fn should_purge_nesting(&self, nesting: &NestingRule) -> bool {
         nesting.style.rules.0.is_empty()
     }
 
-    fn should_purge_document(&self, document: &mut MozDocumentRule) -> bool {
+    fn should_purge_document(&self, document: &MozDocumentRule) -> bool {
         document.rules.0.is_empty()
     }
 
