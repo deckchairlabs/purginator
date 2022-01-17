@@ -24,6 +24,8 @@ impl Purger for PurgeFromHtml {
             component.to_css(&mut selector_string).unwrap();
         }
 
+        dbg!(&selector_string);
+
         let selector = Selector::parse(&selector_string).unwrap();
         let elements = self.document.select(&selector);
 

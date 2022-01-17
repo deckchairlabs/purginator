@@ -113,4 +113,27 @@ mod tests {
 
         purge_test(purgers, css_source, expected_output);
     }
+
+    #[test]
+    pub fn it_can_purge_nested_rule() {
+        let html_source = r#"
+            <div>Hello World</div>
+        "#;
+
+        let css_source = "
+            .nesting {
+                color: red;
+                & .nested {
+                    color: blue;
+                }
+            }
+        ";
+
+        let html_purger = create_html_purger(html_source);
+        let purgers = vec![html_purger];
+
+        let expected_output = "\n";
+
+        purge_test(purgers, css_source, expected_output);
+    }
 }
