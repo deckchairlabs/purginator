@@ -44,24 +44,28 @@ pub trait Purger {
                 }
                 CssRule::Media(media) => {
                     media.rules.0 = self.purge_css_rules(&mut media.rules);
+
                     if self.should_purge_media(media) {
                         continue;
                     }
                 }
                 CssRule::Supports(supports) => {
                     supports.rules.0 = self.purge_css_rules(&mut supports.rules);
+
                     if self.should_purge_supports(supports) {
                         continue;
                     }
                 }
                 CssRule::Nesting(nesting) => {
                     nesting.style.rules.0 = self.purge_css_rules(&mut nesting.style.rules);
+
                     if self.should_purge_nesting(nesting) {
                         continue;
                     }
                 }
                 CssRule::MozDocument(document) => {
                     document.rules.0 = self.purge_css_rules(&mut document.rules);
+
                     if self.should_purge_document(document) {
                         continue;
                     }
