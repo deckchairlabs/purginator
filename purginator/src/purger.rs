@@ -4,16 +4,7 @@ use parcel_css::rules::{
 };
 
 pub trait Purger {
-    fn should_purge_style(&self, style: &mut StyleRule) -> bool {
-        let has_own_declarations = !style.declarations.declarations.is_empty()
-            || !style.declarations.important_declarations.is_empty();
-
-        if has_own_declarations {
-            false
-        } else {
-            style.rules.0.is_empty()
-        }
-    }
+    fn should_purge_style(&self, style: &mut StyleRule) -> bool;
 
     fn should_purge_media(&self, media: &mut MediaRule) -> bool {
         media.rules.0.is_empty()
@@ -31,40 +22,46 @@ pub trait Purger {
         document.rules.0.is_empty()
     }
 
-    fn purge_css_rules(&self, css_rule_list: &mut CssRuleList) -> Vec<CssRule> {
+    fn purge_css_rules(
+        &self,
+        css_rule_list: &mut CssRuleList,
+        _context: Option<&mut StyleRule>,
+    ) -> Vec<CssRule> {
         let mut rules = Vec::new();
         for mut rule in css_rule_list.0.drain(..) {
             match &mut rule {
                 CssRule::Style(style) => {
+                    if !style.rules.0.is_empty() {
+                        style.rules.0 = self.purge_css_rules(&mut style.rules, None);
+                    }
+
                     if self.should_purge_style(style) {
                         continue;
                     }
-
-                    style.rules.0 = self.purge_css_rules(&mut style.rules);
                 }
                 CssRule::Media(media) => {
-                    media.rules.0 = self.purge_css_rules(&mut media.rules);
+                    media.rules.0 = self.purge_css_rules(&mut media.rules, None);
 
                     if self.should_purge_media(media) {
                         continue;
                     }
                 }
                 CssRule::Supports(supports) => {
-                    supports.rules.0 = self.purge_css_rules(&mut supports.rules);
+                    supports.rules.0 = self.purge_css_rules(&mut supports.rules, None);
 
                     if self.should_purge_supports(supports) {
                         continue;
                     }
                 }
-                CssRule::Nesting(nesting) => {
-                    nesting.style.rules.0 = self.purge_css_rules(&mut nesting.style.rules);
+                // CssRule::Nesting(nesting) => {
+                //     nesting.style.rules.0 = self.purge_css_rules(&mut nesting.style.rules, None);
 
-                    if self.should_purge_nesting(nesting) {
-                        continue;
-                    }
-                }
+                //     if self.should_purge_nesting(nesting) {
+                //         continue;
+                //     }
+                // }
                 CssRule::MozDocument(document) => {
-                    document.rules.0 = self.purge_css_rules(&mut document.rules);
+                    document.rules.0 = self.purge_css_rules(&mut document.rules, None);
 
                     if self.should_purge_document(document) {
                         continue;

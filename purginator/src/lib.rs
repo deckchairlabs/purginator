@@ -7,7 +7,7 @@ pub fn purge(mut stylesheet: StyleSheet, purgers: Vec<Box<dyn Purger>>) -> Style
     let mut rules = Vec::new();
 
     for purger_impl in purgers.iter() {
-        rules = purger_impl.purge_css_rules(&mut stylesheet.rules);
+        rules = purger_impl.purge_css_rules(&mut stylesheet.rules, None);
     }
 
     stylesheet.rules.0 = rules;
