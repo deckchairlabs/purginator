@@ -1,5 +1,4 @@
 use crate::purger::Purger;
-use cssparser::ToCss;
 use parcel_css::rules::style::StyleRule;
 use scraper::{Html, Selector};
 
@@ -16,12 +15,7 @@ impl PurgeFromHtml {
 
 impl Purger for PurgeFromHtml {
     fn should_purge_style(&self, style: &mut StyleRule) -> bool {
-        let mut selector_string = String::new();
-        let selectors = style.selectors.0.iter();
-
-        for component in selectors {
-            component.to_css(&mut selector_string).unwrap();
-        }
+        let selector_string = self.style_to_selector_string(style);
 
         dbg!(&selector_string);
 
