@@ -1,110 +1,72 @@
-use cssparser::ToCss;
-use parcel_css::{
-    rules::CssRule,
-    stylesheet::{ParserOptions, StyleSheet},
-};
-use scraper::{Html, Selector};
+use parcel_css::stylesheet::StyleSheet;
+use purger::Purger;
+pub mod html;
+pub mod purger;
 
-pub use crate::error::Error;
+pub fn purge(mut stylesheet: StyleSheet, purgers: Vec<Box<dyn Purger>>) -> StyleSheet {
+    let mut rules = Vec::new();
 
-mod error;
+    for purger_impl in purgers.iter() {
+        rules = purger_impl.purge_css_rules(&mut stylesheet.rules);
+    }
 
-pub fn purge(html: &str, css: &str) -> Result<StyleSheet, Error> {
-    let mut stylesheet = StyleSheet::parse(
-        "styles.css".to_string(),
-        css,
-        ParserOptions {
-            nesting: false,
-            css_modules: false,
-        },
-    )
-    .map_err(|_| Error::ParseError)?;
-
-    let document = Html::parse_document(html);
-    let select_all: Selector = Selector::parse("html, body, body *").unwrap();
-
-    stylesheet.rules.0.retain(|css_rule| match css_rule {
-        CssRule::Style(rule) => {
-            let mut all_elements = document.select(&select_all);
-
-            all_elements.any(|element| {
-                let mut selector_string = String::new();
-                let selectors = rule.selectors.0.iter().rev();
-
-                for component in selectors {
-                    component.to_css(&mut selector_string).unwrap();
-                }
-
-                let selector = Selector::parse(&selector_string).unwrap();
-
-                selector.matches(&element)
-            })
-        }
-        _ => true,
-    });
-
-    Ok(stylesheet)
+    stylesheet.rules.0 = rules;
+    stylesheet
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{purge, Error};
+    use super::*;
+    use crate::html::PurgeFromHtml;
+    use crate::purger::Purger;
+    use parcel_css::stylesheet::{ParserOptions, PrinterOptions};
+
+    fn purge_test(purgers: Vec<Box<dyn Purger>>, css_source: &str, expected_output: &str) {
+        let stylesheet = StyleSheet::parse(
+            "test.css".into(),
+            css_source,
+            ParserOptions {
+                nesting: true,
+                ..ParserOptions::default()
+            },
+        )
+        .unwrap();
+
+        let purged_stylesheet = purge(stylesheet, purgers);
+        let purged_css = purged_stylesheet
+            .to_css(PrinterOptions {
+                ..Default::default()
+            })
+            .unwrap();
+
+        assert_eq!(purged_css.code, expected_output);
+    }
 
     #[test]
-    fn it_works() -> Result<(), Error> {
-        let html = r#"
-            <!DOCTYPE html>
-            <html lang="en" class="dark-theme">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Test</title>
-                </head>
-                <body>
-                    <div class="foo">
-                        This is foo
-                    </div>
-                    
-                    <h1 class="undefined">
-                        This is undefined
-                    </h1>
-                    
-                    <section id="main" class="multiple selectors">
-                        This has multiple selectors!
-                    </section>
-                    
-                    <ul>
-                        <li class="list-item">Nested</li>
-                    </ul>
-                    
-                    <div>Broken html</>
-                </body>
-            </html>
+    pub fn it_works() {
+        let html_source = r#"
+            <div>
+                Hello World!
+            </div>
         "#;
 
-        let css = "
-            .dark-theme body {
-                background-color: #333;
-            }
+        let css_source = "
             .foo {
                 color: red;
             }
-            .bar {
-                color: green;
-            }
-            .multiple {
-                color: maroon;
-            }
-            .multiple.selectors {
-                color: purple;
-            }
-            ul .list-item {
-                color: blue;
+
+            @media (min-width: 400px) {
+                .bar {
+                    color: blue;
+                }
             }
         ";
 
-        let stylesheet = purge(html, css)?;
-        // TODO: test stylesheet result
+        let html_purger = Box::new(PurgeFromHtml::new(html_source)) as Box<dyn Purger>;
+        let purgers = vec![html_purger];
 
-        Ok(())
+        let expected_output = "\n";
+
+        purge_test(purgers, css_source, expected_output);
     }
 }
