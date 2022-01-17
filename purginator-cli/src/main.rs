@@ -1,7 +1,9 @@
 use clap::Parser;
 use miette::IntoDiagnostic;
-use parcel_css::stylesheet::PrinterOptions;
+use parcel_css::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
+use purginator::html::PurgeFromHtml;
 use purginator::purge;
+use purginator::purger::Purger;
 use tokio::fs;
 
 /// Purge css with speed
@@ -21,10 +23,23 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    let html = fs::read_to_string(args.html).await.into_diagnostic()?;
-    let css = fs::read_to_string(args.css).await.into_diagnostic()?;
+    let html_source = fs::read_to_string(args.html).await.into_diagnostic()?;
+    let css_source = fs::read_to_string(args.css).await.into_diagnostic()?;
 
-    let stylesheet = purge(&html, &css).into_diagnostic()?;
+    let stylesheet = StyleSheet::parse(
+        String::from("styles.css"),
+        &css_source,
+        ParserOptions {
+            nesting: true,
+            css_modules: false,
+        },
+    )
+    .unwrap();
+
+    let html_purger = Box::new(PurgeFromHtml::new(&html_source)) as Box<dyn Purger>;
+    let purgers = vec![html_purger];
+
+    let stylesheet = purge(stylesheet, purgers);
 
     let purged_css = stylesheet
         .to_css(PrinterOptions {
