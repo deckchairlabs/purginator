@@ -19,7 +19,10 @@ mod tests {
     use super::*;
     use crate::html::PurgeFromHtml;
     use crate::purger::Purger;
-    use parcel_css::stylesheet::{ParserOptions, PrinterOptions};
+    use parcel_css::{
+        stylesheet::{ParserOptions, PrinterOptions},
+        targets::Browsers,
+    };
 
     fn purge_test(purgers: Vec<Box<dyn Purger>>, css_source: &str, expected_output: &str) {
         let stylesheet = StyleSheet::parse(
@@ -35,6 +38,7 @@ mod tests {
         let purged_stylesheet = purge(stylesheet, purgers);
         let purged_css = purged_stylesheet
             .to_css(PrinterOptions {
+                targets: Some(Browsers::default()),
                 ..Default::default()
             })
             .unwrap();
@@ -56,6 +60,28 @@ mod tests {
 
         let css_source = "
             .foo {
+                color: red;
+            }
+        ";
+
+        let html_purger = create_html_purger(html_source);
+        let purgers = vec![html_purger];
+
+        let expected_output = "\n";
+
+        purge_test(purgers, css_source, expected_output);
+    }
+
+    #[test]
+    pub fn it_handles_pseudo_selectors() {
+        let html_source = r#"
+            <a href="\#">
+                Hello World!
+            </a>
+        "#;
+
+        let css_source = "
+            a:hover {
                 color: red;
             }
         ";

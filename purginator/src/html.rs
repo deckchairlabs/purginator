@@ -18,7 +18,7 @@ impl Purger for PurgeFromHtml {
     fn should_purge_style(&self, style: &mut StyleRule) -> bool {
         let selector_string = style.selectors.to_css_string();
 
-        // If we have nested rules, we should match those selectors instead
+        // TODO: If we have nested rules, we should match from the deepest level up?
         if !style.rules.0.is_empty() {
             dbg!(&style);
             false
