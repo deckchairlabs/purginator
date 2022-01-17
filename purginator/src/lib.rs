@@ -42,8 +42,12 @@ mod tests {
         assert_eq!(purged_css.code, expected_output);
     }
 
+    fn create_html_purger(html_source: &str) -> std::boxed::Box<dyn purger::Purger> {
+        Box::new(PurgeFromHtml::new(html_source)) as Box<dyn Purger>
+    }
+
     #[test]
-    pub fn it_works() {
+    pub fn it_can_purge_simple_style_rules() {
         let html_source = r#"
             <div>
                 Hello World!
@@ -54,15 +58,55 @@ mod tests {
             .foo {
                 color: red;
             }
+        ";
 
+        let html_purger = create_html_purger(html_source);
+        let purgers = vec![html_purger];
+
+        let expected_output = "\n";
+
+        purge_test(purgers, css_source, expected_output);
+    }
+
+    #[test]
+    pub fn it_can_purge_simple_media_rules() {
+        let html_source = r#"
+            <div>
+                Hello World!
+            </div>
+        "#;
+
+        let css_source = "
             @media (min-width: 400px) {
-                .bar {
-                    color: blue;
+                .foo {
+                    color: red;
                 }
             }
         ";
 
-        let html_purger = Box::new(PurgeFromHtml::new(html_source)) as Box<dyn Purger>;
+        let html_purger = create_html_purger(html_source);
+        let purgers = vec![html_purger];
+
+        let expected_output = "\n";
+
+        purge_test(purgers, css_source, expected_output);
+    }
+
+    #[test]
+    pub fn it_can_purge_simple_supports_rule() {
+        let html_source = r#"
+            <div>Hello World</div>
+        "#;
+
+        let css_source = "
+            @supports (display: grid) {
+                .foo {
+                    display: grid;
+                }
+            }
+        ";
+
+        let html_purger = create_html_purger(html_source);
         let purgers = vec![html_purger];
 
         let expected_output = "\n";
