@@ -65,7 +65,29 @@ mod tests {
     }
 
     #[test]
-    pub fn it_handles_pseudo_selectors() {
+    pub fn it_can_purge_multiple_style_rules() {
+        let html_source = r#"
+            <div class="bar">
+                Hello World!
+            </div>
+        "#;
+
+        let css_source = "
+            .foo, .bar {
+                color: red;
+            }
+        ";
+
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        let expected_output = ".bar {\n  color: red;\n}\n";
+
+        purge_test(&purgers, css_source, expected_output);
+    }
+
+    #[test]
+    pub fn it_can_handle_pseudo_selectors() {
         let html_source = r#"
             <a href="\#">
                 Hello World!
@@ -86,6 +108,81 @@ mod tests {
         purge_test(&purgers, css_source, expected_output);
     }
 
+    // https://drafts.csswg.org/selectors/#the-root-pseudo
+    #[test]
+    pub fn it_can_handle_root_pseudos() {
+        let html_source = r#"
+            <html>
+                <head>
+                    <title>Test</title>
+                </head>
+                <body>Hello World!</body>
+            </html>
+        "#;
+
+        let css_source = "
+            :root {
+                color: red;
+            }
+        ";
+
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        let expected_output = ":root {\n  color: red;\n}\n";
+
+        purge_test(&purgers, css_source, expected_output);
+    }
+
+    // https://drafts.csswg.org/selectors/#the-empty-pseudo
+    #[test]
+    pub fn it_can_handle_empty_pseudos() {
+        let html_source = r#"
+            <div>Hello World!</div>
+        "#;
+
+        let css_source = "
+            div:empty {
+                color: red;
+            }
+            div:not(:empty) {
+                color: blue;
+            }
+        ";
+
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        let expected_output = "div:not(:empty) {\n  color: #00f;\n}\n";
+
+        purge_test(&purgers, css_source, expected_output);
+    }
+
+    // https://drafts.csswg.org/selectors/#the-empty-pseudo
+    #[test]
+    pub fn it_can_handle_nth_child_pseudos() {
+        let html_source = r#"
+            <div>Hello World!</div>
+        "#;
+
+        let css_source = "
+            div:nth-child(even) {
+                color: red;
+            }
+
+            div:nth-child(odd) {
+                color:blue;
+            }
+        ";
+
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        let expected_output = "div:nth-child(2n+1) {\n  color: #00f;\n}\n";
+
+        purge_test(&purgers, css_source, expected_output);
+    }
+
     #[test]
     pub fn it_can_purge_simple_media_rules() {
         let html_source = r#"
@@ -98,6 +195,53 @@ mod tests {
             @media (min-width: 400px) {
                 .foo {
                     color: red;
+                }
+            }
+        ";
+
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        let expected_output = "\n";
+
+        purge_test(&purgers, css_source, expected_output);
+    }
+
+    #[test]
+    pub fn it_can_purge_tailwind_style_rules() {
+        let html_source = r#"
+            <div>
+                Hello World!
+            </div>
+        "#;
+
+        let css_source = "
+            .dark\\:bg-red {
+                color: red;
+            }
+        ";
+
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        let expected_output = "\n";
+
+        purge_test(&purgers, css_source, expected_output);
+    }
+
+    #[test]
+    pub fn it_can_purge_nest_rules() {
+        let html_source = r#"
+            <div>
+                Hello World!
+            </div>
+        "#;
+
+        let css_source = "
+            .foo {
+                color: red;
+                @nest .parent & {
+                    color: blue;
                 }
             }
         ";
