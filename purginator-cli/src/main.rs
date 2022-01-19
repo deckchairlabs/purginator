@@ -1,6 +1,6 @@
 use clap::Parser;
 use miette::IntoDiagnostic;
-use parcel_css::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
+use parcel_css::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
 use purginator::purge;
 use purginator::purger::html::PurgeFromHtml;
 use purginator::purger::traits::Purger;
@@ -17,6 +17,10 @@ struct Args {
     /// Path to css file
     #[clap(short, long)]
     css: String,
+
+    /// Path to css file
+    #[clap(short, long)]
+    minify: bool,
 }
 
 #[tokio::main]
@@ -39,11 +43,17 @@ async fn main() -> miette::Result<()> {
     let html_purger = PurgeFromHtml::new(&html_source);
     let purgers: [&dyn Purger; 1] = [&html_purger];
 
-    let stylesheet = purge(stylesheet, &purgers);
+    let mut stylesheet = purge(stylesheet, &purgers);
+
+    if args.minify {
+        stylesheet.minify(MinifyOptions {
+            ..Default::default()
+        });
+    }
 
     let purged_css = stylesheet
         .to_css(PrinterOptions {
-            minify: false,
+            minify: args.minify,
             ..Default::default()
         })
         .map_err(|err| miette::Error::msg(err.reason()))?;
