@@ -48,19 +48,31 @@ mod tests {
 
     #[test]
     pub fn it_can_purge_simple_style_rules() {
-        let html_source = r#"
-            <div>
-                Hello World!
-            </div>
-        "#;
-
         let css_source = "
             .foo {
                 color: red;
             }
         ";
 
-        purge_from_html_test(html_source, css_source, "\n");
+        purge_from_html_test(
+            r#"
+            <div>
+                Hello World!
+            </div>
+        "#,
+            css_source,
+            "\n",
+        );
+
+        purge_from_html_test(
+            r#"
+            <div class="foo">
+                Hello World!
+            </div>
+        "#,
+            css_source,
+            ".foo {\n  color: red;\n}\n",
+        );
     }
 
     #[test]
