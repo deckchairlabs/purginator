@@ -1,2 +1,5 @@
 [workspace]
 members = ["purginator", "purginator-cli"]
+
+[profile.release]
+lto = true
