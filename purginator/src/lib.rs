@@ -1,6 +1,7 @@
 use parcel_css::stylesheet::StyleSheet;
 use purger::traits::Purger;
 pub mod purger;
+pub mod stylesheet;
 
 pub fn purge(mut stylesheet: StyleSheet, purgers: &[&dyn Purger]) -> StyleSheet {
     for purger_impl in purgers.iter() {
@@ -15,19 +16,11 @@ mod tests {
     use super::*;
     use crate::purger::html::PurgeFromHtml;
     use crate::purger::traits::Purger;
-    use parcel_css::stylesheet::{ParserOptions, PrinterOptions};
+    use crate::stylesheet::parse;
+    use parcel_css::stylesheet::PrinterOptions;
 
     fn purge_test(purgers: &[&dyn Purger], css_source: &str, expected_output: &str) {
-        let stylesheet = StyleSheet::parse(
-            "test.css".into(),
-            css_source,
-            ParserOptions {
-                nesting: true,
-                ..ParserOptions::default()
-            },
-        )
-        .unwrap();
-
+        let stylesheet = parse(css_source);
         let purged_stylesheet = purge(stylesheet, purgers);
         let purged_css = purged_stylesheet
             .to_css(PrinterOptions {
