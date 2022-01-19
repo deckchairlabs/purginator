@@ -16,7 +16,11 @@ pub trait Purger {
             !self.should_purge_selector(&selector_string)
         });
 
+        // If there are no selectors or nested rules left, purge the style block
+        // Otherwise, if there are no declarations for this block, purge it
         style.selectors.0.is_empty() && style.rules.0.is_empty()
+            || style.declarations.declarations.is_empty()
+                && style.declarations.important_declarations.is_empty()
     }
 
     fn should_purge_media(&self, media: &MediaRule) -> bool {

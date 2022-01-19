@@ -14,7 +14,6 @@ impl PurgeFromHtml {
 
 impl Purger for PurgeFromHtml {
     fn should_purge_selector(&self, selector_string: &str) -> bool {
-        dbg!(&selector_string);
         let selector = Selector::parse(selector_string).unwrap();
         let elements = self.document.select(&selector);
         elements.count() == 0

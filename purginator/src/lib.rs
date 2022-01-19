@@ -68,6 +68,24 @@ mod tests {
     }
 
     #[test]
+    pub fn it_can_purge_empty_declaration_style_rules() {
+        let css_source = "
+            .foo {
+            }
+        ";
+
+        purge_from_html_test(
+            r#"
+            <div class="foo">
+                Hello World!
+            </div>
+        "#,
+            css_source,
+            "\n",
+        );
+    }
+
+    #[test]
     pub fn it_can_purge_multiple_style_rules() {
         let html_source = r#"
             <div class="bar">
