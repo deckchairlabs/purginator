@@ -8,7 +8,7 @@ cssparser = "0.29.2"
 parcel_css = "1.0.0-alpha.12"
 parcel_selectors = "0.24.0"
 scraper = "0.12"
-thiserror = "1.0"
+thiserror = "1"
 
 # [patch.crates-io]
 # scraper = { git = 'https://github.com/deckchairlabs/scraper' }
