@@ -1,6 +1,5 @@
 use parcel_css::stylesheet::StyleSheet;
-use purger::Purger;
-pub mod html;
+use purger::traits::Purger;
 pub mod purger;
 
 pub fn purge(mut stylesheet: StyleSheet, purgers: &[&dyn Purger]) -> StyleSheet {
@@ -14,8 +13,8 @@ pub fn purge(mut stylesheet: StyleSheet, purgers: &[&dyn Purger]) -> StyleSheet 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::html::PurgeFromHtml;
-    use crate::purger::Purger;
+    use crate::purger::html::PurgeFromHtml;
+    use crate::purger::traits::Purger;
     use parcel_css::stylesheet::{ParserOptions, PrinterOptions};
 
     fn purge_test(purgers: &[&dyn Purger], css_source: &str, expected_output: &str) {

@@ -1,4 +1,4 @@
-use crate::purger::Purger;
+use super::traits::Purger;
 use scraper::{Html, Selector};
 
 pub struct PurgeFromHtml {
