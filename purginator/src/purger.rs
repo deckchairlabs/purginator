@@ -8,7 +8,7 @@ use parcel_css::{
 };
 
 pub trait Purger {
-    fn should_purge_selector(&self, selector: &String) -> bool;
+    fn should_purge_selector(&self, selector: &str) -> bool;
 
     fn should_purge_style(&self, style: &mut StyleRule) -> bool {
         style.selectors.0.retain(|selector| {
