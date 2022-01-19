@@ -4,13 +4,10 @@ pub mod html;
 pub mod purger;
 
 pub fn purge(mut stylesheet: StyleSheet, purgers: &[&dyn Purger]) -> StyleSheet {
-    let mut rules = Vec::new();
-
     for purger_impl in purgers.iter() {
-        rules.extend(purger_impl.purge_css_rules(&mut stylesheet.rules, None));
+        purger_impl.purge(&mut stylesheet);
     }
 
-    stylesheet.rules.0 = rules;
     stylesheet
 }
 
@@ -35,11 +32,18 @@ mod tests {
         let purged_stylesheet = purge(stylesheet, purgers);
         let purged_css = purged_stylesheet
             .to_css(PrinterOptions {
-                ..Default::default()
+                ..PrinterOptions::default()
             })
             .unwrap();
 
         assert_eq!(purged_css.code, expected_output);
+    }
+
+    fn purge_from_html_test(html_source: &str, css_source: &str, expected_output: &str) {
+        let html_purger = PurgeFromHtml::new(html_source);
+        let purgers: [&dyn Purger; 1] = [&html_purger];
+
+        purge_test(&purgers, css_source, expected_output);
     }
 
     #[test]
@@ -56,12 +60,7 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
-        let expected_output = "\n";
-
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, "\n");
     }
 
     #[test]
@@ -78,12 +77,7 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
-        let expected_output = ".bar {\n  color: red;\n}\n";
-
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, ".bar {\n  color: red;\n}\n");
     }
 
     #[test]
@@ -100,12 +94,7 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
-        let expected_output = "\n";
-
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, "\n");
     }
 
     // https://drafts.csswg.org/selectors/#the-root-pseudo
@@ -126,12 +115,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = ":root {\n  color: red;\n}\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     // https://drafts.csswg.org/selectors/#the-empty-pseudo
@@ -150,12 +136,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "div:not(:empty) {\n  color: #00f;\n}\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     // https://drafts.csswg.org/selectors/#the-empty-pseudo
@@ -175,12 +158,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "div:nth-child(2n+1) {\n  color: #00f;\n}\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     #[test]
@@ -199,12 +179,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     #[test]
@@ -221,12 +198,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     #[test]
@@ -246,12 +220,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     #[test]
@@ -268,12 +239,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     #[test]
@@ -290,12 +258,9 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 
     #[test]
@@ -314,11 +279,8 @@ mod tests {
             }
         ";
 
-        let html_purger = PurgeFromHtml::new(html_source);
-        let purgers: [&dyn Purger; 1] = [&html_purger];
-
         let expected_output = "\n";
 
-        purge_test(&purgers, css_source, expected_output);
+        purge_from_html_test(html_source, css_source, expected_output);
     }
 }

@@ -1,6 +1,4 @@
 use crate::purger::Purger;
-use cssparser::ToCss;
-use parcel_css::rules::style::StyleRule;
 use scraper::{Html, Selector};
 
 pub struct PurgeFromHtml {
@@ -15,19 +13,10 @@ impl PurgeFromHtml {
 }
 
 impl Purger for PurgeFromHtml {
-    fn should_purge_style(&self, style: &StyleRule) -> bool {
-        let selector_string = style.selectors.to_css_string();
+    fn should_purge_selector(&self, selector: &Selector) -> bool {
+        let elements = self.document.select(selector);
+        dbg!(selector);
 
-        // TODO: If we have nested rules, we should match from the deepest level up?
-        if !style.rules.0.is_empty() {
-            dbg!(&style);
-            false
-        } else {
-            dbg!(&selector_string);
-            let selector = Selector::parse(&selector_string).unwrap();
-            let elements = self.document.select(&selector);
-
-            elements.count() == 0
-        }
+        elements.count() == 0
     }
 }
