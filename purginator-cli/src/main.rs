@@ -1,9 +1,9 @@
 use clap::Parser;
 use miette::IntoDiagnostic;
 use parcel_css::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
-use purginator::html::PurgeFromHtml;
 use purginator::purge;
-use purginator::purger::Purger;
+use purginator::purger::html::PurgeFromHtml;
+use purginator::purger::traits::Purger;
 use tokio::fs;
 
 /// Purge css with speed
