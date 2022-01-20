@@ -1,0 +1,66 @@
+.foo {
+  color: red;
+}
+
+/* Mutliple */
+.foo,
+.bar,
+.baz {
+  color: red;
+}
+
+/* Chained */
+.foo.bar {
+  color: black;
+}
+
+/* Empty */
+.empty {
+}
+
+p:empty {
+}
+
+[class='baz'] {
+  color: red;
+}
+
+@keyframes animation {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animated {
+  animation: animation 5s infinite;
+}
+
+@font-face {
+  font-family: 'MyWebFont';
+  src: url('myfont.woff2') format('woff2'), url('myfont.woff') format('woff');
+}
+
+.font-face {
+  font-family: 'MyWebFont', Fallback, sans-serif;
+}
+
+@media (min-width: 640px) {
+  .foo {
+    color: orange;
+  }
+  .bar {
+    color: green;
+  }
+  .baz {
+    color: blue;
+  }
+}
