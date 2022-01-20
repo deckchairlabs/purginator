@@ -1,9 +1,11 @@
+mod helpers;
+
 #[cfg(test)]
 pub mod tests {
-    use purginator::test_utils::run_test;
+    use crate::helpers;
 
     fn test() -> String {
-        run_test("attribute_selector")
+        helpers::run_test("attributes/attribute_selector")
     }
 
     #[test]

@@ -8,77 +8,77 @@ a[invented] {
 }
 
 a[target] {
-  color: red;
+  color:red;
 }
 
 /* CSS [attribute="value"] Selector */
-a[target='_blank'] {
+a[target="_blank"] {
   background-color: yellow;
 }
 
-a[target='no_blank'] {
+a[target="no_blank"] {
   background-color: yellow;
 }
 
-input[value=''] {
+input[value=""] {
   background-color: yellow;
 }
 
 /* CSS [attribute~="value"] Selector */
-input[title~='flower'] {
+input[title~="flower"] {
   border: 5px solid yellow;
 }
 
-input[title~='grass'] {
+input[title~="grass"] {
   border: 5px solid yellow;
 }
 
 /* CSS [attribute|="value"] Selector */
-html[lang|='en'] {
+html[lang|="en"] {
   background: yellow;
 }
 
-html[lang|='fr'] {
+html[lang|="fr"] {
   background: yellow;
 }
 
 /* CSS [attribute^="value"] Selector */
-a[href^='http'] {
+a[href^="http"] {
   color: green;
 }
 
-a[href^='ssl'] {
+a[href^="ssl"] {
   color: green;
 }
 
 /* CSS [attribute$="value"] Selector */
-a[href$='pdf'] {
+a[href$="pdf"] {
   color: blue;
 }
 
-a[href$='jpg'] {
+a[href$="jpg"] {
   color: blue;
 }
 
-a[href$='http'] {
+a[href$="http"] {
   color: blue;
 }
 
 /* CSS [attribute*="value"] Selector */
 
-a[title*='thin'] {
+a[title*="thin"] {
   border: 5px solid yellow;
 }
 
-a[title*='fat'] {
+a[title*="fat"] {
   border: 5px solid yellow;
 }
 
 /* CSS [attribute*="value"] Selector with spaces */
-[class*=' class2'] {
+[class*=" class2"] {
   color: green;
 }
-[class*='class1 class2 '] {
+[class*="class1 class2 "] {
   color: blue;
 }
 
