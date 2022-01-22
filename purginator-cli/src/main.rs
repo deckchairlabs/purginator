@@ -34,6 +34,7 @@ async fn main() -> miette::Result<()> {
         String::from("styles.css"),
         &css_source,
         ParserOptions {
+            custom_media: true,
             nesting: true,
             css_modules: false,
         },
@@ -46,9 +47,11 @@ async fn main() -> miette::Result<()> {
     let mut stylesheet = purge(stylesheet, &purgers);
 
     if args.minify {
-        stylesheet.minify(MinifyOptions {
-            ..Default::default()
-        });
+        stylesheet
+            .minify(MinifyOptions {
+                ..Default::default()
+            })
+            .unwrap();
     }
 
     let purged_css = stylesheet

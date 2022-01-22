@@ -1,3 +1,4 @@
+/* Simple */
 .foo {
   color: red;
 }
@@ -21,10 +22,12 @@
 p:empty {
 }
 
+/* Attributes */
 [class='baz'] {
   color: red;
 }
 
+/* Keyframes */
 @keyframes animation {
   0% {
     opacity: 0;
@@ -44,6 +47,20 @@ p:empty {
   animation: animation 5s infinite;
 }
 
+/* Supports */
+@supports (display: grid) {
+  .grid {
+    display: grid;
+  }
+}
+
+@supports not (display: grid) {
+  .grid {
+    display: flex;
+  }
+}
+
+/* Font Faces */
 @font-face {
   font-family: 'MyWebFont';
   src: url('myfont.woff2') format('woff2'), url('myfont.woff') format('woff');
