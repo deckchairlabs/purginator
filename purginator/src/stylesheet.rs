@@ -6,6 +6,7 @@ pub fn parse(css_source: &str) -> StyleSheet {
         css_source,
         ParserOptions {
             nesting: true,
+            custom_media: true,
             ..ParserOptions::default()
         },
     )
