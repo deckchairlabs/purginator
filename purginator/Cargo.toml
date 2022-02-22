@@ -5,13 +5,10 @@ edition = "2021"
 
 [dependencies]
 cssparser = "0.29.2"
-parcel_css = "1.0.0-alpha.13"
-parcel_selectors = "0.24.0"
+parcel_css = "1.0.0-alpha.16"
+parcel_selectors = "0.24.1"
 scraper = "0.12"
 thiserror = "1"
 
 [lib]
 crate-type = ["rlib"]
-
-# [patch.crates-io]
-# scraper = { git = 'https://github.com/deckchairlabs/scraper' }

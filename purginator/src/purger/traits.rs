@@ -7,7 +7,7 @@ use parcel_css::{
     stylesheet::StyleSheet,
 };
 
-pub trait Purger {
+pub trait Purger<'a> {
     fn should_purge_selector(&self, selector_string: &str) -> bool;
 
     fn should_purge_style(&self, style: &mut StyleRule) -> bool {
@@ -39,7 +39,7 @@ pub trait Purger {
         document.rules.0.is_empty()
     }
 
-    fn should_purge_rule(&self, rule: &mut CssRule) -> bool {
+    fn should_purge_rule(&'a self, rule: &mut CssRule<'a>) -> bool {
         match rule {
             CssRule::Style(style) => {
                 style.rules = self.purge_css_rules(&mut style.rules);
@@ -65,7 +65,7 @@ pub trait Purger {
         }
     }
 
-    fn purge_css_rules(&self, rules: &mut CssRuleList) -> CssRuleList {
+    fn purge_css_rules(&'a self, rules: &mut CssRuleList<'a>) -> CssRuleList<'a> {
         let mut new_rules = Vec::new();
         for mut rule in rules.0.drain(..) {
             if !self.should_purge_rule(&mut rule) {
@@ -76,10 +76,7 @@ pub trait Purger {
         CssRuleList(new_rules)
     }
 
-    fn purge<'a>(
-        &self,
-        stylesheet: &'a mut StyleSheet,
-    ) -> &'a mut parcel_css::stylesheet::StyleSheet {
+    fn purge(&'a self, stylesheet: &'a mut StyleSheet<'a>) -> &'a mut StyleSheet<'a> {
         stylesheet.rules = self.purge_css_rules(&mut stylesheet.rules);
         stylesheet
     }

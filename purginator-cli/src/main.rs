@@ -37,6 +37,7 @@ async fn main() -> miette::Result<()> {
             custom_media: true,
             nesting: true,
             css_modules: false,
+            source_index: 0,
         },
     )
     .unwrap();
@@ -44,7 +45,7 @@ async fn main() -> miette::Result<()> {
     let html_purger = PurgeFromHtml::new(&html_source);
     let purgers: [&dyn Purger; 1] = [&html_purger];
 
-    let mut stylesheet = purge(stylesheet, &purgers);
+    let mut stylesheet = purge(&mut stylesheet, &purgers);
 
     if args.minify {
         stylesheet

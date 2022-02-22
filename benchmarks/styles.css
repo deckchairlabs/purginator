@@ -81,3 +81,6 @@ p:empty {
     color: blue;
   }
 }
+
+@media screen {
+}
