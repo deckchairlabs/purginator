@@ -67,7 +67,8 @@ where
                     !predicate(&selector_string)
                 });
 
-                style.is_empty()
+                style.selectors.0.is_empty()
+                    || style.is_empty()
                     || style.declarations.declarations.is_empty()
                         && style.declarations.important_declarations.is_empty()
             }
