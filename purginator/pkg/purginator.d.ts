@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} css_source
-* @param {string} html_source
-* @returns {string}
+* @param {Uint8Array} css_bytes
+* @param {Uint8Array} html_bytes
+* @returns {Uint8Array}
 */
-export function purge(css_source: string, html_source: string): string;
+export function purge(css_bytes: Uint8Array, html_bytes: Uint8Array): Uint8Array;

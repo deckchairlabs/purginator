@@ -81,9 +81,19 @@ where
 }
 
 #[wasm_bindgen]
-pub fn purge(css_source: String, html_source: String) -> String {
-    let stylesheet = parse(&css_source);
-    let purgable_stylesheet = PurgeableStyleSheet::new(stylesheet, &html_source);
+pub fn purge(css_bytes: &[u8], html_bytes: &[u8]) -> Vec<u8> {
+    let css_source = match std::str::from_utf8(css_bytes) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+
+    let html_source = match std::str::from_utf8(html_bytes) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+
+    let stylesheet = parse(css_source);
+    let purgable_stylesheet = PurgeableStyleSheet::new(stylesheet, html_source);
     let purged_stylesheet = purgable_stylesheet.purge();
 
     let purged_css = purged_stylesheet
@@ -92,5 +102,5 @@ pub fn purge(css_source: String, html_source: String) -> String {
         })
         .unwrap();
 
-    purged_css.code
+    purged_css.code.into_bytes()
 }

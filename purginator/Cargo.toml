@@ -9,6 +9,10 @@ parcel_css = "1.0.0-alpha.23"
 parcel_selectors = "0.24.4"
 scraper = "0.13"
 wasm-bindgen = "0.2.80"
+instant = "0.1.12"
+
+[features]
+default = ["instant/wasm-bindgen", "instant/inaccurate"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
