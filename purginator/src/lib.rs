@@ -94,8 +94,11 @@ pub fn purge(css_bytes: &[u8], html_bytes: &[u8]) -> Vec<u8> {
     };
 
     let stylesheet = parse(css_source);
-    let purgable_stylesheet = PurgeableStyleSheet::new(stylesheet, html_source);
-    let purged_stylesheet = purgable_stylesheet.purge();
+    let transformed = stylesheet.to_css(Default::default()).unwrap();
+    let transformed_source = parse(&transformed.code);
+
+    let purgeable_stylesheet = PurgeableStyleSheet::new(transformed_source, html_source);
+    let purged_stylesheet = purgeable_stylesheet.purge();
 
     let purged_css = purged_stylesheet
         .to_css(PrinterOptions {
