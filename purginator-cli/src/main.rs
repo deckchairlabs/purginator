@@ -1,9 +1,6 @@
 use clap::Parser;
 use miette::IntoDiagnostic;
-use parcel_css::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
 use purginator::purge;
-use purginator::purger::html::PurgeFromHtml;
-use purginator::purger::traits::Purger;
 use tokio::fs;
 
 /// Purge css with speed
@@ -30,39 +27,9 @@ async fn main() -> miette::Result<()> {
     let html_source = fs::read_to_string(args.html).await.into_diagnostic()?;
     let css_source = fs::read_to_string(args.css).await.into_diagnostic()?;
 
-    let stylesheet = StyleSheet::parse(
-        String::from("styles.css"),
-        &css_source,
-        ParserOptions {
-            custom_media: true,
-            nesting: true,
-            css_modules: false,
-            source_index: 0,
-        },
-    )
-    .unwrap();
+    let result = purge(css_source, html_source);
 
-    let html_purger = PurgeFromHtml::new(&html_source);
-    let purgers: [&dyn Purger; 1] = [&html_purger];
-
-    let mut stylesheet = purge(&mut stylesheet, &purgers);
-
-    if args.minify {
-        stylesheet
-            .minify(MinifyOptions {
-                ..Default::default()
-            })
-            .unwrap();
-    }
-
-    let purged_css = stylesheet
-        .to_css(PrinterOptions {
-            minify: args.minify,
-            ..Default::default()
-        })
-        .map_err(|err| miette::Error::msg(err.reason()))?;
-
-    println!("{}", purged_css.code);
+    println!("{}", result);
 
     Ok(())
 }

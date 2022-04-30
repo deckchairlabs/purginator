@@ -1,9 +1,4 @@
-use parcel_css::stylesheet::PrinterOptions;
-use purginator::{
-    purge,
-    purger::{html::PurgeFromHtml, traits::Purger},
-    stylesheet::parse,
-};
+use purginator::purge;
 use std::{env, fs};
 
 pub fn run_test(test_name: &str) -> String {
@@ -23,16 +18,8 @@ pub fn run_test(test_name: &str) -> String {
     ))
     .unwrap();
 
-    let html_purger = PurgeFromHtml::new(&html_source);
-    let purgers: [&dyn Purger; 1] = [&html_purger];
+    let result = purge(css_source, html_source);
 
-    let stylesheet = parse(&css_source);
-    let purged_stylesheet = purge(stylesheet, &purgers);
-    let purged_css = purged_stylesheet
-        .to_css(PrinterOptions {
-            ..PrinterOptions::default()
-        })
-        .unwrap();
-
-    purged_css.code
+    println!("{}", result);
+    result
 }

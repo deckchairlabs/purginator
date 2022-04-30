@@ -1,5 +1,6 @@
 [workspace]
-members = ["purginator", "purginator-cli"]
+members = ["purginator", "purginator-cli", "server"]
 
 [profile.release]
 lto = true
+opt-level = "s"
