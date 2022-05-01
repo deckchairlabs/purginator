@@ -66,7 +66,7 @@ where
     fn should_purge(&mut self, predicate: F) -> bool {
         match self {
             CssRule::Style(style) => {
-                let mut selector = format!("{}", style.selectors);
+                let mut selector = style.selectors.to_string();
 
                 if selector == ":root" {
                     selector = "html".to_owned();
