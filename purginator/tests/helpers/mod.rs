@@ -26,6 +26,5 @@ pub fn run_test(test_name: &str) -> String {
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
 
-    println!("{}", s);
     s.to_owned()
 }

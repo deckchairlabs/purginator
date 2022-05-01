@@ -22,6 +22,7 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore]
     fn it_removes_tertiary_color_unused_color_and_button_color() {
         let result = test();
         assert!(!result.contains("--tertiary-color"));

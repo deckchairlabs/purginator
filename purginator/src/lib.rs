@@ -1,4 +1,3 @@
-use cssparser::ToCss;
 use parcel_css::rules::{CssRule, CssRuleList};
 use parcel_css::stylesheet::{PrinterOptions, StyleSheet};
 use scraper::{Html, Selector};
@@ -33,9 +32,14 @@ impl<'a> PurgeableStyleSheet<'a> {
 
     pub fn purge(self) -> StyleSheet<'a> {
         let predicate = |selector_string: &String| -> bool {
-            let selector = Selector::parse(selector_string).unwrap();
-            let elements = self.document.select(&selector);
-            elements.count() == 0
+            let result = Selector::parse(selector_string);
+            match result {
+                Ok(result) => {
+                    let elements = self.document.select(&result);
+                    elements.count() == 0
+                }
+                Err(_) => false,
+            }
         };
 
         let rules = self.stylesheet.rules.clone();
@@ -62,12 +66,14 @@ where
     fn should_purge(&mut self, predicate: F) -> bool {
         match self {
             CssRule::Style(style) => {
-                style.selectors.0.retain(|selector| {
-                    let selector_string = selector.to_css_string();
-                    !predicate(&selector_string)
-                });
+                let mut selector = format!("{}", style.selectors);
 
-                style.selectors.0.is_empty()
+                if selector == ":root" {
+                    selector = "html".to_owned();
+                }
+
+                predicate(&selector)
+                    || style.selectors.0.is_empty()
                     || style.is_empty()
                     || style.declarations.declarations.is_empty()
                         && style.declarations.important_declarations.is_empty()
