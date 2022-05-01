@@ -11,20 +11,21 @@ pub mod tests {
     #[test]
     fn it_keeps_font_face_cerebri_bold() {
         let result = test();
-        assert!(result.contains("src: url(../fonts/CerebriSans-Bold.eot?)"));
+        assert!(result.contains("../fonts/CerebriSans-Bold.eot?"));
     }
 
     #[test]
     fn it_keeps_font_face_cerebri_sans() {
         let result = test();
-        assert!(result.contains("src: url(../fonts/CerebriSans-Regular.eot?)"));
+        assert!(result.contains("../fonts/CerebriSans-Regular.eot?"));
     }
 
     #[test]
     #[ignore]
     fn it_removes_font_face_other_font() {
         let result = test();
-        assert!(!result.contains("src: url(xxx)"));
+        println!("{}", result);
+        assert!(!result.contains("xxx"));
         assert!(!result.contains("OtherFont"));
     }
 }
