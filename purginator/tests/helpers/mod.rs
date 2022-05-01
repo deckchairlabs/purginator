@@ -19,7 +19,7 @@ pub fn run_test(test_name: &str) -> String {
     ))
     .unwrap();
 
-    let result: &[u8] = &purge(css_source.as_bytes(), html_source.as_bytes());
+    let result: &[u8] = &purge(css_source.as_bytes(), html_source.as_bytes(), None);
 
     let s = match str::from_utf8(result) {
         Ok(v) => v,

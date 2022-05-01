@@ -25,6 +25,10 @@ function passArray8ToWasm0(arg, malloc) {
     return ptr;
 }
 
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
+
 let cachegetInt32Memory0 = null;
 function getInt32Memory0() {
     if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
@@ -39,16 +43,17 @@ function getArrayU8FromWasm0(ptr, len) {
 /**
 * @param {Uint8Array} css_bytes
 * @param {Uint8Array} html_bytes
+* @param {boolean | undefined} minify
 * @returns {Uint8Array}
 */
-export function purge(css_bytes, html_bytes) {
+export function purge(css_bytes, html_bytes, minify) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(css_bytes, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passArray8ToWasm0(html_bytes, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        wasm.purge(retptr, ptr0, len0, ptr1, len1);
+        wasm.purge(retptr, ptr0, len0, ptr1, len1, isLikeNone(minify) ? 0xFFFFFF : minify ? 1 : 0);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var v2 = getArrayU8FromWasm0(r0, r1).slice();

@@ -88,7 +88,9 @@ where
 }
 
 #[wasm_bindgen]
-pub fn purge(css_bytes: &[u8], html_bytes: &[u8]) -> Vec<u8> {
+pub fn purge(css_bytes: &[u8], html_bytes: &[u8], minify: Option<bool>) -> Vec<u8> {
+    let minify = minify.unwrap_or(false);
+
     let css_source = match std::str::from_utf8(css_bytes) {
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
@@ -108,6 +110,7 @@ pub fn purge(css_bytes: &[u8], html_bytes: &[u8]) -> Vec<u8> {
 
     let purged_css = purged_stylesheet
         .to_css(PrinterOptions {
+            minify,
             ..PrinterOptions::default()
         })
         .unwrap();

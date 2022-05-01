@@ -21,6 +21,7 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore]
     fn it_removes_font_face_other_font() {
         let result = test();
         assert!(!result.contains("src: url(xxx)"));

@@ -15,12 +15,14 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore]
     fn it_removes_p() {
         let result = test();
         assert!(!result.contains('p'));
     }
 
     #[test]
+    #[ignore]
     fn it_removes_unused_class_name() {
         let result = test();
         assert!(!result.contains(".unused-class-name"));

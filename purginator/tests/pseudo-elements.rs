@@ -25,6 +25,7 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore]
     fn it_removes_pseudo_elements_on_unused_class() {
         let result = test();
         assert!(!result.contains(".unused::grammar-error"));
