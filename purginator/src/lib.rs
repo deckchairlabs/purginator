@@ -1,6 +1,5 @@
 use parcel_css::rules::CssRule;
 use parcel_css::stylesheet::{PrinterOptions, StyleSheet};
-use retain_mut::RetainMut;
 use scraper::{Html, Selector};
 use stylesheet::parse;
 use wasm_bindgen::prelude::*;
@@ -10,11 +9,11 @@ trait Purge<'a> {
     fn purge(self, stylesheet: &PurgeableStyleSheet<'a>) -> Self;
 }
 
-trait ShouldPurge<'a, F>
+trait ShouldPurge<F>
 where
     F: Fn(&String) -> bool,
 {
-    fn should_purge(&mut self, predicate: F) -> bool;
+    fn should_purge(self, predicate: F) -> bool;
 }
 
 struct PurgeableStyleSheet<'a> {
@@ -31,7 +30,7 @@ impl<'a> PurgeableStyleSheet<'a> {
         }
     }
 
-    pub fn purge(mut self) -> StyleSheet<'a> {
+    pub fn purge(self) -> StyleSheet<'a> {
         let predicate = |selector_string: &String| -> bool {
             let result = Selector::parse(selector_string);
             match result {
@@ -46,7 +45,7 @@ impl<'a> PurgeableStyleSheet<'a> {
         self.stylesheet
             .rules
             .0
-            .retain_mut(|rule| !rule.should_purge(&predicate));
+            .retain(|rule| !rule.should_purge(&predicate));
 
         StyleSheet::new(
             self.stylesheet.sources,
@@ -56,11 +55,11 @@ impl<'a> PurgeableStyleSheet<'a> {
     }
 }
 
-impl<'a, F> ShouldPurge<'a, F> for CssRule<'a>
+impl<'a, F> ShouldPurge<F> for CssRule<'a>
 where
     F: Fn(&String) -> bool,
 {
-    fn should_purge(&mut self, predicate: F) -> bool {
+    fn should_purge(self, predicate: F) -> bool {
         match self {
             CssRule::Style(style) => {
                 let selector = style.selectors.to_string();
@@ -71,33 +70,30 @@ where
                     || style.declarations.declarations.is_empty()
                         && style.declarations.important_declarations.is_empty()
             }
-            CssRule::Media(media) => {
-                media
-                    .rules
-                    .0
-                    .retain_mut(move |rule| !rule.should_purge(&predicate));
+            CssRule::Media(mut media) => {
+                media.rules.0.retain(|rule| !rule.should_purge(&predicate));
                 media.rules.0.is_empty()
             }
-            CssRule::Supports(supports) => {
+            CssRule::Supports(mut supports) => {
                 supports
                     .rules
                     .0
-                    .retain_mut(|rule| !rule.should_purge(&predicate));
+                    .retain(|rule| !rule.should_purge(&predicate));
                 supports.rules.0.is_empty()
             }
-            CssRule::Nesting(nesting) => {
+            CssRule::Nesting(mut nesting) => {
                 nesting
                     .style
                     .rules
                     .0
-                    .retain_mut(|rule| !rule.should_purge(&predicate));
+                    .retain(|rule| !rule.should_purge(&predicate));
                 nesting.style.rules.0.is_empty()
             }
-            CssRule::MozDocument(document) => {
+            CssRule::MozDocument(mut document) => {
                 document
                     .rules
                     .0
-                    .retain_mut(|rule| !rule.should_purge(&predicate));
+                    .retain(|rule| !rule.should_purge(&predicate));
                 document.rules.0.is_empty()
             }
             _ => false,
