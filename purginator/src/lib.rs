@@ -5,10 +5,6 @@ use stylesheet::parse;
 use wasm_bindgen::prelude::*;
 pub mod stylesheet;
 
-trait Purge<'a> {
-    fn purge(self, stylesheet: &PurgeableStyleSheet<'a>) -> Self;
-}
-
 struct PurgeableStyleSheet<'a> {
     pub stylesheet: StyleSheet<'a>,
     document: Html,
@@ -23,70 +19,60 @@ impl<'a> PurgeableStyleSheet<'a> {
         }
     }
 
-    pub fn purge(self) -> StyleSheet<'a> {
-        let rules = self.stylesheet.rules.clone();
-        let mut new_rules = Vec::new();
-
-        for rule in rules.0 {
-            if !Self::should_purge(&self.document, &rule) {
-                new_rules.push(rule.clone());
-            }
-        }
+    pub fn purge(mut self) -> StyleSheet<'a> {
+        self.stylesheet.rules = Self::retain_used_rules(self.stylesheet.rules.0, &self.document);
 
         StyleSheet::new(
             self.stylesheet.sources,
-            CssRuleList(new_rules),
+            self.stylesheet.rules,
             Default::default(),
         )
     }
 
-    fn should_purge(document: &Html, rule: &CssRule) -> bool {
+    fn retain_used_rules(rules: Vec<CssRule<'a>>, document: &Html) -> CssRuleList<'a> {
+        let mut new_rules = Vec::new();
+
+        for mut rule in rules {
+            if Self::should_retain_rule(&mut rule, document) {
+                new_rules.push(rule);
+            }
+        }
+
+        CssRuleList(new_rules)
+    }
+
+    fn should_retain_rule(rule: &mut CssRule<'a>, document: &Html) -> bool {
         match rule.to_owned() {
             CssRule::Style(style) => {
                 let selector = style.selectors.to_string();
                 let result = Selector::parse(&selector);
-                let purgable = match result {
+
+                let selector_is_retainable = match result {
                     Ok(result) => {
                         let elements = document.select(&result);
-                        elements.count() == 0
+                        let matched_elements_count = elements.count();
+                        matched_elements_count > 0
                     }
-                    Err(_) => false,
+                    Err(_) => true,
                 };
 
-                purgable
-                    || style.selectors.0.is_empty()
-                    || style.is_empty()
-                    || style.declarations.declarations.is_empty()
-                        && style.declarations.important_declarations.is_empty()
+                selector_is_retainable
             }
             CssRule::Media(mut media) => {
-                media
-                    .rules
-                    .0
-                    .retain(|rule| !Self::should_purge(document, rule));
-                media.rules.0.is_empty()
+                media.rules = Self::retain_used_rules(media.rules.0, document);
+                !media.rules.0.is_empty()
             }
             CssRule::Supports(mut supports) => {
-                supports
-                    .rules
-                    .0
-                    .retain(|rule| !Self::should_purge(document, rule));
-                supports.rules.0.is_empty()
+                supports.rules = Self::retain_used_rules(supports.rules.0, document);
+                !supports.rules.0.is_empty()
             }
             CssRule::Nesting(mut nesting) => {
-                nesting
-                    .style
-                    .rules
-                    .0
-                    .retain(|rule| !Self::should_purge(document, rule));
-                nesting.style.rules.0.is_empty()
+                nesting.style.rules = Self::retain_used_rules(nesting.style.rules.0, document);
+                !nesting.style.rules.0.is_empty()
             }
             CssRule::MozDocument(mut document_rule) => {
-                document_rule
-                    .rules
-                    .0
-                    .retain(|rule| !Self::should_purge(document, rule));
-                document_rule.rules.0.is_empty()
+                document_rule.rules = Self::retain_used_rules(document_rule.rules.0, document);
+                !document_rule.rules.0.is_empty()
             }
             _ => false,
         }
