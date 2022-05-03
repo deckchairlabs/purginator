@@ -27,9 +27,18 @@ async fn main() -> miette::Result<()> {
     let html_source = fs::read_to_string(args.html).await.into_diagnostic()?;
     let css_source = fs::read_to_string(args.css).await.into_diagnostic()?;
 
-    let result = purge(css_source, html_source);
+    let result: &[u8] = &purge(
+        css_source.as_bytes(),
+        html_source.as_bytes(),
+        Some(args.minify),
+    );
 
-    println!("{}", result);
+    let stylesheet = match std::str::from_utf8(result) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+
+    println!("{}", stylesheet.to_owned());
 
     Ok(())
 }

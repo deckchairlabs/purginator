@@ -21,10 +21,10 @@ pub fn run_test(test_name: &str) -> String {
 
     let result: &[u8] = &purge(css_source.as_bytes(), html_source.as_bytes(), None);
 
-    let s = match str::from_utf8(result) {
+    let stylesheet = match str::from_utf8(result) {
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
 
-    s.to_owned()
+    stylesheet.to_owned()
 }
