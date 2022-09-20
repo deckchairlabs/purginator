@@ -1,6 +1,8 @@
 [workspace]
-members = ["purginator", "purginator-cli", "server"]
+members = ["rs_lib"]
 
 [profile.release]
+codegen-units = 1
+incremental = true
 lto = true
-opt-level = "s"
+opt-level = "z"
